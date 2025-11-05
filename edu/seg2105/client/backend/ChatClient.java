@@ -80,6 +80,27 @@ public class ChatClient extends AbstractClient
       quit();
     }
   }
+
+  /**
+   * This method announces that the connection to the server has ended
+   */
+  @Override
+  protected void connectionClosed() {
+    clientUI.display("The connection has ended.");
+  }
+
+  /**
+   * This method is called when an exception occurs from the connection with the server
+   * 
+   * @param exception The exception raised
+   */
+  @Override
+  protected void connectionException(Exception exception) {
+    clientUI.display("Error:" + exception + " Terminating client.");
+    if (isConnected()) {
+      quit();
+    }
+  }
   
   /**
    * This method terminates the client.

@@ -1,0 +1,7 @@
+edu\seg2105\client\backend\ChatClient.java
+edu\seg2105\client\common\ChatIF.java
+edu\seg2105\client\ui\ClientConsole.java
+edu\seg2105\edu\server\backend\EchoServer.java
+ocsf\client\AbstractClient.java
+ocsf\server\AbstractServer.java
+ocsf\server\ConnectionToClient.java
