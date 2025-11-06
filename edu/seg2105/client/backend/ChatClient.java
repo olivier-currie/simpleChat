@@ -28,6 +28,10 @@ public class ChatClient extends AbstractClient
    */
   ChatIF clientUI; 
 
+  /**
+   * 
+   */
+  String login_id;
   
   //Constructors ****************************************************
   
@@ -39,12 +43,16 @@ public class ChatClient extends AbstractClient
    * @param clientUI The interface type variable.
    */
   
-  public ChatClient(String host, int port, ChatIF clientUI) 
+  public ChatClient(String login_id, String host, int port, ChatIF clientUI) 
     throws IOException 
   {
     super(host, port); //Call the superclass constructor
     this.clientUI = clientUI;
+    this.login_id = login_id;
     openConnection();
+    if (isConnected()) {
+      sendToServer("#login " + login_id);
+    }
   }
 
   
@@ -84,6 +92,9 @@ public class ChatClient extends AbstractClient
           if (!isConnected()) {
             try {
               openConnection();
+              if (isConnected()) {
+                sendToServer("#login " + login_id);
+              }
             } catch (IOException io) {}
           } else {
             System.out.println("Error: Client already connected to the server.");

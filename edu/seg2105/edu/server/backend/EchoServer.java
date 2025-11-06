@@ -55,9 +55,24 @@ public class EchoServer extends AbstractServer
   public void handleMessageFromClient
     (Object msg, ConnectionToClient client)
   {
-    System.out.println("Message received: " + msg + " from " + client);
-    this.sendToAllClients(msg);
+    if (msg instanceof String) {
+      String message = (String) msg;
+      if (message.startsWith("#login")) {
+        String[] separatedString = message.split(" ");
+        if (client.getInfo("login id") == null) {
+          client.setInfo("login id", separatedString[1]);
+        } else {
+          try {
+            client.sendToClient("Error: Duplicate connexion.");
+            client.close();
+          } catch (Exception e) {}
+        }
+      } else {
+        this.sendToAllClients(client.getInfo("login id") + ": "+ message);
+      }
   }
+    System.out.println("Message received: " + msg + " from " + client);
+  } 
   /**
    * This method handles messages from the console
    * 
