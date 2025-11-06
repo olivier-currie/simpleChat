@@ -5,6 +5,7 @@ package edu.seg2105.edu.server.backend;
 
 
 import ocsf.server.*;
+import edu.seg2105.client.common.*;
 
 /**
  * This class overrides some of the methods in the abstract 
@@ -23,6 +24,11 @@ public class EchoServer extends AbstractServer
    * The default port to listen on.
    */
   final public static int DEFAULT_PORT = 5555;
+
+  /**
+   * The ui
+   */
+  ChatIF serverUI;
   
   //Constructors ****************************************************
   
@@ -31,9 +37,10 @@ public class EchoServer extends AbstractServer
    *
    * @param port The port number to connect on.
    */
-  public EchoServer(int port) 
+  public EchoServer(int port, ChatIF serverUI) 
   {
     super(port);
+    this.serverUI = serverUI;
   }
 
   
@@ -50,6 +57,70 @@ public class EchoServer extends AbstractServer
   {
     System.out.println("Message received: " + msg + " from " + client);
     this.sendToAllClients(msg);
+  }
+  /**
+   * This method handles messages from the console
+   * 
+   * @param message The message received
+   */
+  public void handleMessageFromServerUI(String message) {
+    //if the message is a command
+    if (message.startsWith("#")) {
+      switch(message) {
+        case "#quit":
+          try {
+            close();
+          } catch (Exception e) {
+            System.out.println("Server Error: Couldn't close properly");
+          }
+          System.exit(0);
+          break;
+        case "#stop":
+          stopListening();
+          break;
+        case "#close":
+          try {
+            close();
+          } catch (Exception e) {
+            System.out.println("Server Error: Couldn't close properly");
+          }
+          break;
+        case "#start":
+          if (!isListening()) {
+            try {
+              listen();
+            } catch (Exception e) {
+              System.out.println("Server Error: Couldn't start the server.");
+            }
+          } else {
+            System.out.println("Error: Already listening.");
+          }
+          break;
+        case "#getport":
+          serverUI.display(Integer.toString(getPort()));
+          break;
+        default:
+          String[] separatedString = message.split(" ");
+          if (message.startsWith("#setport")) {
+            try {
+              if (!isListening()) {
+                setPort(Integer.parseInt(separatedString[1]));
+              } else {
+                System.out.println("Error: need to be disconnected to execute #sethost");
+              }
+            } catch (Exception e) {
+              System.out.println("Invalid command.");
+            }
+          } else {
+            //do nothing
+          }
+          break;
+      }
+      // if it isn't a command
+    } else {
+      serverUI.display(message);
+      this.sendToAllClients("SERVER MSG> " + message);
+    }
   }
     
   /**
@@ -105,39 +176,5 @@ public class EchoServer extends AbstractServer
     System.out.println("Error from client: " + exception);
   }
   
-  
-  //Class methods ***************************************************
-  
-  /**
-   * This method is responsible for the creation of 
-   * the server instance (there is no UI in this phase).
-   *
-   * @param args[0] The port number to listen on.  Defaults to 5555 
-   *          if no argument is entered.
-   */
-  public static void main(String[] args) 
-  {
-    int port = 0; //Port to listen on
-
-    try
-    {
-      port = Integer.parseInt(args[0]); //Get port from command line
-    }
-    catch(Throwable t)
-    {
-      port = DEFAULT_PORT; //Set port to 5555
-    }
-	
-    EchoServer sv = new EchoServer(port);
-    
-    try 
-    {
-      sv.listen(); //Start listening for connections
-    } 
-    catch (Exception ex) 
-    {
-      System.out.println("ERROR - Could not listen for clients!");
-    }
-  }
 }
 //End of EchoServer class

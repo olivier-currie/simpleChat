@@ -69,7 +69,62 @@ public class ChatClient extends AbstractClient
    */
   public void handleMessageFromClientUI(String message)
   {
-    try
+    // if the message is a command
+    if (message.startsWith("#")) {
+      switch(message) {
+        case "#quit":
+          quit();
+          break;
+        case "#logoff":
+          try {
+            closeConnection();
+          } catch (IOException io) {}
+          break;
+        case "#login":
+          if (!isConnected()) {
+            try {
+              openConnection();
+            } catch (IOException io) {}
+          } else {
+            System.out.println("Error: Client already connected to the server.");
+          }
+          break;
+        case "#gethost":
+          clientUI.display(getHost());
+          break;
+        case "#getport":
+          clientUI.display(Integer.toString(getPort()));
+          break;
+        default:
+          String[] separatedString = message.split(" ");
+          if (message.startsWith("#sethost")) {
+            try {
+              if (!isConnected()) {
+                setHost(separatedString[1]);
+              } else {
+                System.out.println("Error: need to be disconnected to execute #sethost");
+              }
+            } catch (ArrayIndexOutOfBoundsException e) {
+              System.out.println("Invalid command.");
+            }
+          } else if (message.startsWith("#setport")) {
+            try {
+              if (!isConnected()) {
+                setPort(Integer.parseInt(separatedString[1]));
+              } else {
+                clientUI.display("Error: need to be disconnected to execute #setport");
+              }
+            } catch (Exception e) {
+              System.out.println("Invalid command.");
+            }
+          } else {
+            // do nothing
+          }
+          break;
+      }
+      // if it isn't a command
+    } else {
+      try
     {
       sendToServer(message);
     }
@@ -78,6 +133,7 @@ public class ChatClient extends AbstractClient
       clientUI.display
         ("Could not send message to server.  Terminating client.");
       quit();
+    }
     }
   }
 
