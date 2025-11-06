@@ -71,7 +71,7 @@ public class EchoServer extends AbstractServer
         this.sendToAllClients(client.getInfo("login id") + ": "+ message);
       }
   }
-    System.out.println("Message received: " + msg + " from " + client);
+    System.out.println("Message received: " + msg + " from " + client.getInfo("login id"));
   } 
   /**
    * This method handles messages from the console
